@@ -11,18 +11,33 @@ namespace XmlCharacteristicsGenerator
             ExcelReader.ReadExcel($"C:\\HAR.xls", xmlList);
             var filesCount = 0;
 
+            var DateStart = DateTime.Now;
+            await Console.Out.WriteLineAsync($"Начало процесса: {DateStart}");
+
+            //foreach (var item in xmlList)
+            //{
+            //    Console.WriteLine($"Формирую файл xml #{filesCount}. {item.ResunId}.");
+            //    item.SaveToXmlFile();
+            //    filesCount++;                
+            //}
+
             var tasks = xmlList.Select(async item =>
             {
+                await Console.Out.WriteLineAsync($"Формирую файл xml #{filesCount}. {item.ResunId}.");
                 await item.SaveToXmlFileAsync();
                 filesCount++;
             });
 
             await Task.WhenAll(tasks);
 
-            Console.WriteLine("SUCCESS!");
-            Console.WriteLine($"Files created: {filesCount}");
+            await Console.Out.WriteLineAsync(new string ('-', 50));
+            await Console.Out.WriteLineAsync($"Выполнено. Файлов создано: {filesCount}");
 
-            Console.ReadKey();
+            var DateEnd = DateTime.Now;
+            await Console.Out.WriteLineAsync($"Конец процесса: {DateEnd}");
+            await Console.Out.WriteLineAsync($"Затрачено времени: {(DateEnd - DateStart).Seconds} с.");
+
+            await Console.In.ReadLineAsync();
         }
     }
 }
