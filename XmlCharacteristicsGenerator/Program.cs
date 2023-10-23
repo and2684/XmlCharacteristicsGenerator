@@ -1,4 +1,5 @@
-﻿using XmlCharacteristicsGenerator.Logic;
+﻿using System.Text;
+using XmlCharacteristicsGenerator.Logic;
 using XmlCharacteristicsGenerator.Model;
 
 namespace XmlCharacteristicsGenerator
@@ -7,33 +8,25 @@ namespace XmlCharacteristicsGenerator
     {
         static async Task Main()
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             var xmlList = new List<XmlInfoString>();
             ExcelReader.ReadExcel($"C:\\HAR.xls", xmlList);
-            var filesCount = 0;
 
             var DateStart = DateTime.Now;
             await Console.Out.WriteLineAsync($"Начало процесса: {DateStart}");
 
-            //foreach (var item in xmlList)
-            //{
-            //    Console.WriteLine($"Формирую файл xml #{filesCount}. {item.ResunId}.");
-            //    item.SaveToXmlFile();
-            //    filesCount++;                
-            //}
-
-            var tasks = xmlList.Select(async item =>
+            var tasks = xmlList.Select(async (item, index) => // index нужен для правильного указания номера формируемой xml. код асинхронный и простой счетчик тут не работает
             {
-                await Console.Out.WriteLineAsync($"Формирую файл xml #{filesCount}. {item.ResunId}.");
+                Console.WriteLine($"Формирую файл xml #{index}. {item.ResunId}.");
                 await item.SaveToXmlFileAsync();
-                filesCount++;
-            });
+            }).ToArray(); // Преобразуем результат Select в массив задач.
 
             await Task.WhenAll(tasks);
 
-            await Console.Out.WriteLineAsync(new string ('-', 50));
-            await Console.Out.WriteLineAsync($"Выполнено. Файлов создано: {filesCount}");
-
             var DateEnd = DateTime.Now;
+            await Console.Out.WriteLineAsync(new string('-', 50));
+            await Console.Out.WriteLineAsync($"Выполнено. Файлов создано: {xmlList.Count}");
+
             await Console.Out.WriteLineAsync($"Конец процесса: {DateEnd}");
             await Console.Out.WriteLineAsync($"Затрачено времени: {(DateEnd - DateStart).Seconds} с.");
 

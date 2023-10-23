@@ -1,5 +1,4 @@
 ﻿using ExcelLibrary.SpreadSheet;
-using System.Xml.Linq;
 
 namespace XmlCharacteristicsGenerator.Model
 {
